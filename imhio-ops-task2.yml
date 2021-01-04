@@ -1,0 +1,12 @@
+- name: Task2
+  tasks:
+    - name: Copy rpm file to server
+      copy:
+        src: https://cloud.imhio.com/s/aDH5ktf99CG7k8D/download
+        dest: /tmp/tcg.rpm
+
+    - name: Install package.
+      yum:
+        name: /tmp/tcg.rpm
+        state: present
+        
