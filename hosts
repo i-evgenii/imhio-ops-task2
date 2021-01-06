@@ -1,2 +1,2 @@
-privatenet-us-vm1 ansible_host=172.16.0.2
-privatenet-us-vm2 ansible_host=172.16.0.3
+privatenet-us-vm1 ansible_host=35.188.77.187 ansible_sudo_pass=password ansible_become=true ansible_user=a-user ansible_password=password
+privatenet-us-vm2 ansible_host=35.188.87.183 ansible_sudo_pass=password ansible_become=true ansible_user=a-user ansible_password=password

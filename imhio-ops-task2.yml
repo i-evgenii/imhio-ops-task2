@@ -1,12 +1,100 @@
-- name: Task2
+- name: Task2-vm1
+  hosts: privatenet-us-vm1
   tasks:
-    - name: Copy rpm file to server
-      copy:
-        src: https://cloud.imhio.com/s/aDH5ktf99CG7k8D/download
+    - name: Copy rpm file to server.
+      get_url:
+        url: https://cloud.imhio.com/s/aDH5ktf99CG7k8D/download
         dest: /tmp/tcg.rpm
+        mode: '0440'
 
     - name: Install package.
       yum:
         name: /tmp/tcg.rpm
         state: present
-        
+
+    - name: Copy config.
+      copy:
+        src: /etc/tcg/tcg.config.sample.json
+        dest: /etc/tcg/tcg.json
+        remote_src: yes
+        owner: root
+        group: root
+        mode: '0644'
+
+- name: Task2-vm2
+  hosts: privatenet-us-vm2
+  tasks:
+    - parted:
+        device: /dev/sdb
+        number: 1
+        flags: [ lvm ]
+        state: present
+
+    - filesystem:
+        fstype: ext2
+        dev: /dev/sdb1
+
+    - mount:
+        fstype: ext2
+        src: /dev/sdb1
+        path: /dbfiles
+        state: mounted
+
+    - name: Install mariadb
+      action: yum name={{ item }}
+      with_items:
+        - mariadb-server
+        - mariadb-libs
+        - mariadb
+
+    - name: Start the mariadb service
+      action: service name=mariadb state=started
+
+    - name: mariadb | Stop service to move data
+      service:
+        name: mariadb
+        state: stopped
+        enabled: yes
+      when: mariadb_init.changed
+
+    - name: mariadb | Copy data
+      shell: "{{ item }}"
+      with_items:
+        - "cp -R -p /var/lib/mariadb /dbfiles "
+      sudo: yes
+      when: mariadb_init.changed
+
+    - name: mariadb | Update mariadb configuration
+      replace:
+        dest: /etc/mariadb/my.cnf
+        regexp: '/var/lib/mariadb'
+        replace: '/dbfiles/mariadb'
+      when: mariadb_init.changed
+
+    - name: mariadb | Update AppArmor configuration
+      replace:
+        dest: /etc/apparmor.d/usr.sbin.mariadbd
+        regexp: '/var/lib/mariadb/'
+        replace: '/dbfiles/mariadb/'
+      when: mariadb_init.changed
+
+    - name: mariadb | Reload service AppArmor
+      service:
+        name: apparmor
+        state: reloaded
+        enabled: yes
+      when: mariadb_init.changed
+
+    - name: mariadb | Start service after moving data
+      service:
+        name: mariadb
+        state: restarted
+        enabled: yes
+      when: mariadb_init.changed
+
+    - name: mariadb | Check if old data directory is removed
+      file:
+        path: /var/lib/mariadb
+        state: absent
+      sudo: yes
+
