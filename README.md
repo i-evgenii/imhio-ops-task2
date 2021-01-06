@@ -27,6 +27,7 @@ PasswordAuthentication yes
 
 
 2. Загрузить и распаковать сценарий Ansible
+> cd .. <br>
 > rm main.zip <br>
 > wget https://github.com/i-evgenii/imhio-ops-task2/archive/main.zip <br>
 > unzip main.zip <br>
@@ -42,4 +43,4 @@ PasswordAuthentication yes
 > ansible-playbook ./imhio-ops-task2.yml -i hosts
 
 6. Вернуть защиту ssh соединения в Firewall
-> gcloud compute firewall-rules update publicnet-allow-ssh --source-ranges "[35.235.240.0/20, 109.163.216.0/21]"
+> gcloud compute firewall-rules update publicnet-allow-ssh --source-ranges "35.235.240.0/20,109.163.216.0/21"
