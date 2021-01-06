@@ -34,13 +34,13 @@ PasswordAuthentication yes
 > rm main.zip <br>
 > cd imhio-ops-task2-main
 
-3. Обновить ip-адреса/пароли в файле hosts, указать ip-адреса privatenet-us-vm2 в сценарии Ansible
+3. Обновить ip-адреса/пароли в файле hosts
 
 4. Временно разрешить все ssh соединения в Firewall
 > gcloud compute firewall-rules update publicnet-allow-ssh --source-ranges "0.0.0.0/0"
 
-5. Выполнить сценарий Ansible
-> ansible-playbook ./imhio-ops-task2.yml -i hosts
+5. Выполнить сценарий Ansible, в параметрах указать ip-адрес приватной сети privatenet-us-vm2
+> ansible-playbook ./imhio-ops-task2.yml -i hosts --extra-vars "dbip=172.16.0.2 dbrootpwd=mysql-root-password dbusrpwd=mysql-tcg-password"
 
 6. Вернуть защиту ssh соединения в Firewall
 > gcloud compute firewall-rules update publicnet-allow-ssh --source-ranges "35.235.240.0/20,109.163.216.0/21"

@@ -1,9 +1,5 @@
 - name: Task2-vm1
   hosts: privatenet-us-vm1
-  vars:
-    dbip: 172.16.0.2
-    dbrootpwd: mysql-root-password
-    dbusrpwd: mysql-tcg-password
   tasks:
     - name: Copy rpm file to server
       get_url:
