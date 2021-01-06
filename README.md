@@ -22,7 +22,7 @@ PasswordAuthentication yes
 
 ## В консоли CloudShell:
 1. Установить:
-> sudo pip install ansible
+> sudo pip install ansible <br>
 > sudo apt-get install sshpass
 
 
