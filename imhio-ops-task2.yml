@@ -40,12 +40,13 @@
         path: /dbfiles
         state: mounted
 
-    - name: Install mariadb
+    - name: Install mariadb plus semanage
       action: yum name={{ item }}
       with_items:
         - mariadb-server
         - mariadb-libs
         - mariadb
+        - policycoreutils-python
 
     - name: Start the mariadb service
       action: service name=mariadb state=started
@@ -55,46 +56,48 @@
         name: mariadb
         state: stopped
         enabled: yes
-      when: mariadb_init.changed
 
-    - name: mariadb | Copy data
+    - name: mariadb | Copy data plus permissions
       shell: "{{ item }}"
       with_items:
-        - "cp -R -p /var/lib/mariadb /dbfiles "
-      sudo: yes
-      when: mariadb_init.changed
+        - "cp -R -p /var/lib/mysql /dbfiles "
+        - "semanage fcontext -a -t mysqld_db_t \"/dbfiles/mysql(/.*)?\" "
+        - "restorecon -Rv /dbfiles/mysql "
 
     - name: mariadb | Update mariadb configuration
       replace:
-        dest: /etc/mariadb/my.cnf
-        regexp: '/var/lib/mariadb'
-        replace: '/dbfiles/mariadb'
-      when: mariadb_init.changed
-
-    - name: mariadb | Update AppArmor configuration
-      replace:
-        dest: /etc/apparmor.d/usr.sbin.mariadbd
-        regexp: '/var/lib/mariadb/'
-        replace: '/dbfiles/mariadb/'
-      when: mariadb_init.changed
-
-    - name: mariadb | Reload service AppArmor
-      service:
-        name: apparmor
-        state: reloaded
-        enabled: yes
-      when: mariadb_init.changed
+        dest: /etc/my.cnf
+        regexp: '/var/lib/mysql'
+        replace: '/dbfiles/mysql'
 
     - name: mariadb | Start service after moving data
       service:
         name: mariadb
         state: restarted
         enabled: yes
-      when: mariadb_init.changed
 
     - name: mariadb | Check if old data directory is removed
       file:
-        path: /var/lib/mariadb
+        path: /var/lib/mysql
         state: absent
-      sudo: yes
 
+    - name: Create a new database tcg_db
+      mysql_db:
+        name: tcg_db
+        login_host: 172.16.0.3
+        state: present
+
+    - name: Update mysql root password
+      mysql_user: name=root host={{item}} password="mysql-root-password"
+      with_items:
+        - 127.0.0.1
+        - ::1
+        - localhost
+
+    - name: Update mysql tcg password
+      mysql_user: name=tcg host={{item}} password="mysql-tcg-password"
+      with_items:
+        - 127.0.0.1
+        - ::1
+        - localhost
+        - 172.16.0.3
