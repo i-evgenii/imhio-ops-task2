@@ -8,11 +8,16 @@
 
 2. Добавить права новому пользователю
 > sudo vi /etc/sudoers
+```
 a-user  ALL=(ALL)       ALL
+```
 
 3. Разрешить вход с паролем в SSH
 > sudo vi /etc/ssh/sshd_config
+```
 PasswordAuthentication yes
+```
+
 > sudo systemctl restart sshd
 
 ## В консоли CloudShell:
