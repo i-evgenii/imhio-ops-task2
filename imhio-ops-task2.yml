@@ -22,12 +22,20 @@
         mode: '0644'
 
     - name: tcg mysql conf
-      json_patch:
-        src: /etc/tcg/tcg.json
-        operations:
-          - op: replace
-            path: "/0/mysql/host"
-            value: "172.16.0.3"
+      replace:
+        regexp: '\"mysql\": {(.*)}'
+        replace: ''
+
+    - name: tcg mysql conf
+      blockinfile:
+        insertafter: 'mysql'
+        block: |
+          "host": "172.16.0.2",
+          "port": 3306,
+          "user": "tcg_user",
+          "pass": "mysql-tcg-password",
+          "database": "tcg_db",
+          "max_lifetime": 60
 
     - name: tcg mysql conf2
       lineinfile:
