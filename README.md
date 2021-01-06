@@ -3,7 +3,7 @@
 ## На каждой виртуальной машине:
 
 1. Создать пользователя для Ansible
-> sudo adduser a-user
+> sudo adduser a-user <br>
 > sudo passwd a-user
 
 2. Добавить права новому пользователю
