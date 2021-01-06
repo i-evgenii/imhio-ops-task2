@@ -21,6 +21,20 @@
         group: root
         mode: '0644'
 
+    - name: tcg mysql conf
+      lineinfile:
+        path: /etc/tcg/tcg.json
+        regexp: '^"host"'
+        insertafter: '^"mysql": {'
+        line: '"host": "172.16.0.2",'
+
+    - name: tcg mysql conf2
+      lineinfile:
+        path: /etc/tcg/tcg.json
+        regexp: '^"pass"'
+        insertafter: '^"mysql": {'
+        line: '"pass": "mysql-tcg-password",'
+
 - name: Task2-vm2
   hosts: privatenet-us-vm2
   tasks:
@@ -92,25 +106,23 @@
       file:
         path: /var/lib/mysql
         state: absent
-
           
     - name: Set MySQL root Password
       mysql_user:
         login_host: 'localhost'
-        login_unix_socket: '/dbfiles/mysql/mysql.sock'
         login_user: 'root'
         login_password: ''
+        login_unix_socket: '/dbfiles/mysql/mysql.sock'
         name: 'root'
         password: 'mysql-root-password'
         state: present
 
     - name: Create a new database tcg_db
       mysql_db:
-        name: tcg_db
-        login_unix_socket: '/dbfiles/mysql/mysql.sock'
-        login_host: 172.16.0.3
         login_user: 'root'
         login_password: 'mysql-root-password'
+        login_unix_socket: '/dbfiles/mysql/mysql.sock'
+        name: tcg_db
         state: present
 
     - name: Update mysql tcg password
@@ -118,7 +130,7 @@
         login_user: 'root'
         login_password: 'mysql-root-password' 
         login_unix_socket: '/dbfiles/mysql/mysql.sock'
-        login_host: 172.16.0.3
-        name: tcg_usr 
+        name: tcg_user 
         priv: tcg_db.*:ALL
         password: "mysql-tcg-password"
+        state: present
