@@ -1,5 +1,9 @@
 - name: Task2-vm1
   hosts: privatenet-us-vm1
+  vars:
+    dbip: 172.16.0.2
+    dbrootpwd: mysql-root-password
+    dbusrpwd: mysql-tcg-password
   tasks:
     - name: Copy rpm file to server
       get_url:
@@ -21,29 +25,32 @@
         group: root
         mode: '0644'
 
-    - name: tcg mysql conf
+    - name: tcg mysql conf 1st
       replace:
-        regexp: '\"mysql\": {(.*)}'
-        replace: ''
+        path: /etc/tcg/tcg.json
+        regexp: '"host": "127.0.0.1",'
+        replace: '"host": "{{ dbip }}",'
 
-    - name: tcg mysql conf
-      blockinfile:
-        insertafter: 'mysql'
-        block: |
-          "host": "172.16.0.2",
-          "port": 3306,
-          "user": "tcg_user",
-          "pass": "mysql-tcg-password",
-          "database": "tcg_db",
-          "max_lifetime": 60
+    - name: tcg mysql conf 2st
+      lineinfile:
+        path: /etc/tcg/tcg.json
+        regexp: '"host": "{{ dbip }}",'
+        line: '"host": "127.0.0.1",'
 
-    - name: tcg mysql conf2
+    - name: tcg mysql conf 3rd
+      lineinfile:
+        path: /etc/tcg/tcg.json
+        regexp: '"host": "{{ dbip }}",'
+        line: '"host": "127.0.0.1",'
+        firstmatch: yes
+
+    - name: tcg mysql conf 4th
       lineinfile:
         path: /etc/tcg/tcg.json
         insertafter: 'mysql'
         firstmatch: yes
         regexp: 'pass'
-        line: '"pass": "mysql-tcg-password",'
+        line: '"pass": "{{ dbusrpwd }}",'
 
 - name: Task2-vm2
   hosts: privatenet-us-vm2
@@ -117,30 +124,47 @@
         path: /var/lib/mysql
         state: absent
           
-    - name: Set MySQL root Password
+    - name: mariadb | root password
       mysql_user:
         login_host: 'localhost'
         login_user: 'root'
         login_password: ''
         login_unix_socket: '/dbfiles/mysql/mysql.sock'
         name: 'root'
-        password: 'mysql-root-password'
+        password: '{{ dbrootpwd }}'
+        host_all: yes
         state: present
 
-    - name: Create a new database tcg_db
+    - name: mariadb | a new database tcg_db
       mysql_db:
         login_user: 'root'
-        login_password: 'mysql-root-password'
+        login_password: '{{ dbrootpwd }}'
         login_unix_socket: '/dbfiles/mysql/mysql.sock'
         name: tcg_db
         state: present
 
-    - name: Update mysql tcg password
+    - name: mariadb | user tcg
       mysql_user:
         login_user: 'root'
-        login_password: 'mysql-root-password' 
+        login_password: '{{ dbrootpwd }}' 
         login_unix_socket: '/dbfiles/mysql/mysql.sock'
         name: tcg_user 
         priv: tcg_db.*:ALL
-        password: "mysql-tcg-password"
+        password: "{{ dbusrpwd }}"
+        host_all: yes
         state: present
+
+- name: Task2-vm1-start-service
+  hosts: privatenet-us-vm1
+  tasks:
+    - name: Enable service tcg
+      systemd:
+        name: tcg
+        enabled: yes
+        masked: no
+
+    - name: Restart service tcg
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: tcg

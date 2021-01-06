@@ -34,7 +34,7 @@ PasswordAuthentication yes
 > rm main.zip <br>
 > cd imhio-ops-task2-main
 
-3. Обновить ip-адреса в файле hosts
+3. Обновить ip-адреса/пароли в файле hosts, указать ip-адреса privatenet-us-vm2 в сценарии Ansible
 
 4. Временно разрешить все ssh соединения в Firewall
 > gcloud compute firewall-rules update publicnet-allow-ssh --source-ranges "0.0.0.0/0"
