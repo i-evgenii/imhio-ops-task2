@@ -21,7 +21,7 @@ PasswordAuthentication yes
 > sudo systemctl restart sshd
 
 ## В консоли CloudShell:
-1. Установить:
+1. Установить Ansible:
 > sudo pip install ansible <br>
 > sudo apt-get install sshpass
 
