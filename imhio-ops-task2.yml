@@ -22,17 +22,19 @@
         mode: '0644'
 
     - name: tcg mysql conf
-      lineinfile:
-        path: /etc/tcg/tcg.json
-        regexp: '^"host"'
-        insertafter: '^"mysql": {'
-        line: '"host": "172.16.0.2",'
+      json_patch:
+        src: /etc/tcg/tcg.json
+        operations:
+          - op: replace
+            path: "/0/mysql/host"
+            value: "172.16.0.3"
 
     - name: tcg mysql conf2
       lineinfile:
         path: /etc/tcg/tcg.json
-        regexp: '^"pass"'
-        insertafter: '^"mysql": {'
+        insertafter: 'mysql'
+        firstmatch: yes
+        regexp: 'pass'
         line: '"pass": "mysql-tcg-password",'
 
 - name: Task2-vm2
