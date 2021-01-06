@@ -22,19 +22,16 @@ PasswordAuthentication yes
 
 ## В консоли CloudShell:
 1. Установить:
-```
-sudo pip install ansible
-sudo apt-get install sshpass
-```
+> sudo pip install ansible
+> sudo apt-get install sshpass
+
 
 2. Загрузить и распаковать сценарий Ansible
-```
-rm main.zip
-wget https://github.com/i-evgenii/imhio-ops-task2/archive/main.zip
-unzip main.zip
-rm main.zip
-cd imhio-ops-task2-main
-```
+> rm main.zip
+> wget https://github.com/i-evgenii/imhio-ops-task2/archive/main.zip
+> unzip main.zip
+> rm main.zip
+> cd imhio-ops-task2-main
 
 3. Обновить ip-адреса в файле hosts
 
