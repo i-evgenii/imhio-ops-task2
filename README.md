@@ -27,10 +27,10 @@ PasswordAuthentication yes
 
 
 2. Загрузить и распаковать сценарий Ansible
-> rm main.zip
-> wget https://github.com/i-evgenii/imhio-ops-task2/archive/main.zip
-> unzip main.zip
-> rm main.zip
+> rm main.zip <br>
+> wget https://github.com/i-evgenii/imhio-ops-task2/archive/main.zip <br>
+> unzip main.zip <br>
+> rm main.zip <br>
 > cd imhio-ops-task2-main
 
 3. Обновить ip-адреса в файле hosts
