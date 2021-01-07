@@ -153,6 +153,7 @@
         name: tcg_user 
         priv: tcg_db.*:ALL
         password: "{{ dbusrpwd }}"
+        host: '%'
         state: present
 
 - name: Task2-vm1-start-service
