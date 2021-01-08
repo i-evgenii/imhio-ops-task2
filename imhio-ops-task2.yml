@@ -51,7 +51,7 @@
     - name: firewall allow tcp-8084
       shell: "{{ item }}"
       with_items:
-        - "firewall-cmd --zone=public --permanent --add-port=8084/tcp"
+        - "firewall-cmd --permanent --add-port=8084/tcp"
         - "firewall-cmd --reload"
 
 - name: Task2-vm2
